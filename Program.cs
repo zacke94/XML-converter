@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO; 
 using System.Collections.Generic;
+using System.Xml;
   
 namespace XMLConverterApp {
     class XMLConverter {
@@ -10,7 +11,7 @@ namespace XMLConverterApp {
         {
             Console.WriteLine("Trying to read the text file 'rowbased_format.txt'...");
 
-            const string path = @"rowbased_format.txt";
+            const string path = @"people.txt";
             string fileName = Path.GetFileName(path);
         
            
@@ -35,6 +36,15 @@ namespace XMLConverterApp {
             var pLetters = new List<string> {"T", "A", "F"};
             var fLetters = new List<string> {"T", "A"};
 
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.Indent = true;
+            XmlWriter writer = XmlWriter.Create(@"people.xml", settings);
+
+            writer.WriteStartDocument();
+
+            writer.WriteStartElement("people");
+          
+
             foreach(KeyValuePair<int, string[]> element in myDict)
             {
                 if(String.Equals(element.Value[0], "P"))
@@ -45,6 +55,7 @@ namespace XMLConverterApp {
                     }
                     else
                     {
+                        writer.WriteStartElement("person");
                         Console.WriteLine("Previous letter is: '{0}'. Current letter is: '{1}'.", previousLetter, element.Value[0]);
                         previousLetter = "P";
                     }
@@ -93,6 +104,10 @@ namespace XMLConverterApp {
                 // }
                 
             }
+
+            writer.WriteEndElement();
+            writer.WriteEndDocument();
+            writer.Close();
         }
 
         static void Main(string[] args) {

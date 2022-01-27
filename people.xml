@@ -24,11 +24,11 @@
     <family>
       <name>Carl Philip</name>
       <year>1979</year>
+      <phone>
+        <mobile>0768-101802</mobile>
+        <landline>08-101802</landline>
+      </phone>
     </family>
-    <phone>
-      <mobile>0768-101802</mobile>
-      <landline>08-101802</landline>
-    </phone>
   </person>
   <person>
     <firstname>Barack</firstname>

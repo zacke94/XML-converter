@@ -7,6 +7,7 @@ namespace XMLConverterApp {
     class XMLConverter {
 
         static private Dictionary<int, string[]> myDict = new Dictionary<int, string[]>();
+
         static void ReadTxtFile()
         {
             Console.WriteLine("Trying to read the text file 'rowbased_format.txt'...");
@@ -14,16 +15,21 @@ namespace XMLConverterApp {
             const string path = @"people.txt";
             string fileName = Path.GetFileName(path);
         
-           
             string[] lines = File.ReadAllLines(fileName);
             
             int dictIndex = 0;
+
 
             foreach(string line in lines)
             {
                 string[] splittedLine = line.Split('|');
                 myDict.Add(dictIndex, splittedLine);
                 dictIndex++;
+
+
+                
+
+                
             }
 
             Console.WriteLine("File successfully read!");
@@ -35,6 +41,7 @@ namespace XMLConverterApp {
             string previousLetter = "";
             var pLetters = new List<string> {"T", "A", "F"};
             var fLetters = new List<string> {"T", "A"};
+            bool firstPerson = true;
 
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.Indent = true;
@@ -49,49 +56,147 @@ namespace XMLConverterApp {
             {
                 if(String.Equals(element.Value[0], "P"))
                 {
-                    if(String.Equals(previousLetter, "F") || String.Equals(previousLetter, "P"))
+                    // if(String.Equals(previousLetter, "F") || String.Equals(previousLetter, "P"))
+                    // {
+                    //     Console.WriteLine("Error! The letter '{0}' cannot be used after the '{1}'.", element.Value[0], previousLetter);
+                    // }
+                    // else
+                    // {
+                    if(firstPerson == false)
                     {
-                        Console.WriteLine("Error! The letter '{0}' cannot be used after the '{1}'.", element.Value[0], previousLetter);
-                    }
-                    else
-                    {
-                        writer.WriteStartElement("person");
-                        Console.WriteLine("Previous letter is: '{0}'. Current letter is: '{1}'.", previousLetter, element.Value[0]);
-                        previousLetter = "P";
+                        writer.WriteEndElement();
                     }
 
+                    writer.WriteStartElement("person");
+
+                    writer.WriteStartElement("firstname");
+                    writer.WriteString(element.Value[1]);
+                    writer.WriteEndElement();
+
+                    writer.WriteStartElement("lastname");
+                    writer.WriteString(element.Value[2]);
+                    writer.WriteEndElement();
+
+                    //Console.WriteLine("Previous letter is: '{0}'. Current letter is: '{1}'.", previousLetter, element.Value[0]);
+                    previousLetter = element.Value[0];
+                    firstPerson = false;
+                    //}
+
+                }
+                else if(String.Equals(element.Value[0], "T"))
+                {
+                    if(String.Equals(previousLetter, "F"))
+                    {
+                        writer.WriteEndElement();
+                    }
+                    writer.WriteStartElement("phone");
+
+                    writer.WriteStartElement("mobile");
+                    writer.WriteString(element.Value[1]);
+                    writer.WriteEndElement();
+
+                    writer.WriteStartElement("landline");
+                    writer.WriteString(element.Value[2]);
+                    writer.WriteEndElement();
+
+                    writer.WriteEndElement();
+                }
+                else if(String.Equals(element.Value[0], "A"))
+                {
+                    // if(String.Equals(previousLetter, "F"))
+                    // {
+                    //     writer.WriteEndElement();
+                    // }
+                    writer.WriteStartElement("address");
+
+                    writer.WriteStartElement("street");
+                    writer.WriteString(element.Value[1]);
+                    writer.WriteEndElement();
+
+                    writer.WriteStartElement("city");
+                    writer.WriteString(element.Value[2]);
+                    writer.WriteEndElement();
+
+                    writer.WriteStartElement("zipcode");
+                    writer.WriteString(element.Value[3]);
+                    writer.WriteEndElement();
+
+                    writer.WriteEndElement();
                 }
                 else if(String.Equals(element.Value[0], "F"))
                 {
                     if(String.Equals(previousLetter, "F"))
                     {
-                        Console.WriteLine("Error! The letter '{0}' cannot be used after the '{1}'.", element.Value[0], previousLetter);
+                        writer.WriteEndElement();
                     }
-                    else
-                    {
-                        Console.WriteLine("Previous letter is: '{0}'. Current letter is: '{1}'.", previousLetter, element.Value[0]);
-                        previousLetter = "F";
-                    }
-                }
-                else
-                {
-                    if(String.Equals(previousLetter, "P") && pLetters.Contains(element.Value[0]))
-                    {
-                        Console.WriteLine("Previous letter is: '{0}'. Current letter is: '{1}'.", previousLetter, element.Value[0]);
-                    }
-                    else if(String.Equals(previousLetter, "F") && fLetters.Contains(element.Value[0]))
-                    {
-                        Console.WriteLine("Previous letter is: '{0}'. Current letter is: '{1}'.", previousLetter, element.Value[0]);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error! The order is incorrect.");
-                        Console.WriteLine("Previous letter is: '{0}'. Current letter is: '{1}'.", previousLetter, element.Value[0]);
+                    writer.WriteStartElement("family");
 
-                        // EXIT?
-                    }
-                    //Console.WriteLine("Should not enter");
+                    writer.WriteStartElement("name");
+                    writer.WriteString(element.Value[1]);
+                    writer.WriteEndElement();
+
+                    writer.WriteStartElement("year");
+                    writer.WriteString(element.Value[2]);
+                    writer.WriteEndElement();
+
+                    previousLetter = element.Value[0];
                 }
+                // else
+                // {
+                //     if(String.Equals(previousLetter, "P") && pLetters.Contains(element.Value[0]))
+                //     {
+                //         Console.WriteLine("Previous letter is: '{0}'. Current letter is: '{1}'.", previousLetter, element.Value[0]);
+                //     }
+                //     else if(String.Equals(previousLetter, "F") && fLetters.Contains(element.Value[0]))
+                //     {
+                //         Console.WriteLine("Previous letter is: '{0}'. Current letter is: '{1}'.", previousLetter, element.Value[0]);
+                //     }
+                //     if(checkCondition(previousLetter, element.Value[0]))
+                //     {
+                //         Console.WriteLine("Previous letter is: '{0}'. Current letter is: '{1}'.", previousLetter, element.Value[0]);
+
+                //         if(String.Equals(element.Value[0], "T"))
+                //         {
+                //             writer.WriteStartElement("phone");
+
+                //             writer.WriteStartElement("mobile");
+                //             writer.WriteString(element.Value[1]);
+                //             writer.WriteEndElement();
+
+                //             writer.WriteStartElement("landline");
+                //             writer.WriteString(element.Value[2]);
+                //             writer.WriteEndElement();
+
+                //             writer.WriteEndElement();
+                //         }
+                //         else if(String.Equals(element.Value[0], "A"))
+                //         {
+                //             writer.WriteStartElement("address");
+
+                //             writer.WriteStartElement("street");
+                //             writer.WriteString(element.Value[1]);
+                //             writer.WriteEndElement();
+
+                //             writer.WriteStartElement("city");
+                //             writer.WriteString(element.Value[2]);
+                //             writer.WriteEndElement();
+
+                //             writer.WriteStartElement("zipcode");
+                //             writer.WriteString(element.Value[3]);
+                //             writer.WriteEndElement();
+
+                //             writer.WriteEndElement();
+                //         }
+                //     }
+                //     else
+                //     {
+                //         Console.WriteLine("Error! The order is incorrect.");
+                //         Console.WriteLine("Previous letter is: '{0}'. Current letter is: '{1}'.", previousLetter, element.Value[0]);
+
+                //         // EXIT?
+                //     }
+                //     Console.WriteLine("Should not enter");
+                // }
 
                 
 

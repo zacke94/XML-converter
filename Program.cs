@@ -6,7 +6,7 @@ using System.Xml;
 namespace XMLConverterApp {
     class XMLConverter {
 
-        static private List<string[]> myList = new List<string[]>();
+        static private List<string[]> listOfLines = new List<string[]>();
 
         static void ReadTxtFile()
         {
@@ -16,10 +16,11 @@ namespace XMLConverterApp {
             string fileName = Path.GetFileName(path);
             string[] lines = File.ReadAllLines(fileName);
 
+            //Reading each line from textfile and split the line by '|' into an array.
             foreach(string line in lines)
             {
                 string[] splittedLine = line.Split('|');
-                myList.Add(splittedLine);
+                listOfLines.Add(splittedLine);
             }
             Console.WriteLine("File successfully read!");
         }
@@ -28,8 +29,8 @@ namespace XMLConverterApp {
         {
             Console.WriteLine("Converting to XML format...");
 
-            string previousLetter = "";
-            bool firstPerson = true;
+            string previousLetter = ""; //To save information about previous letter, to which level the new tag should be. (E.g. deeper level)
+            bool firstPerson = true;    //To know if to close the previous 'Person' tag before adding a new.
 
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.Indent = true;
@@ -38,15 +39,15 @@ namespace XMLConverterApp {
             writer.WriteStartDocument();
             writer.WriteStartElement("people");
 
-            foreach(string[] element in myList)
+            foreach(string[] element in listOfLines)
             {
                 if(String.Equals(element[0], "P"))
-                {
-                    if(firstPerson == false)
+                {   
+                    if(firstPerson == false) //Close the previous 'Person' tag before adding a new.
                     {
                         writer.WriteEndElement();
 
-                        if(String.Equals(previousLetter, "F"))
+                        if(String.Equals(previousLetter, "F")) //If the previus letter is 'Family', it should close that 'Family' tag before adding a new 'Person' 
                             writer.WriteEndElement();
                     }
 
@@ -60,8 +61,8 @@ namespace XMLConverterApp {
                     writer.WriteString(element[2]);
                     writer.WriteEndElement();
 
-                    previousLetter = element[0];
-                    firstPerson = false;
+                    previousLetter = element[0]; 
+                    firstPerson = false; // Will be used later if another Person will be added
                 }
                 else if(String.Equals(element[0], "T"))
                 {
@@ -97,10 +98,9 @@ namespace XMLConverterApp {
                 }
                 else if(String.Equals(element[0], "F"))
                 {
-                    if(String.Equals(previousLetter, "F"))
-                    {
+                    if(String.Equals(previousLetter, "F")) //If the previus letter is 'Family', it should close that 'Family' tag before adding a new 'Family'. 
                         writer.WriteEndElement();
-                    }
+                    
                     writer.WriteStartElement("family");
 
                     writer.WriteStartElement("name");
@@ -129,8 +129,8 @@ namespace XMLConverterApp {
             Console.WriteLine("------------------------------------------------------");
             Console.WriteLine();
 
-            ReadTxtFile();
-            WriteToXML();
+            ReadTxtFile(); //Reading the text file into a list of arrays
+            WriteToXML();  //Iterate the list of arrays and write as XML format
         }
     }
 }

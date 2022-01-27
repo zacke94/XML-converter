@@ -6,28 +6,28 @@ using System.Xml;
 namespace XMLConverterApp {
     class XMLConverter {
 
-        static private Dictionary<int, string[]> myDict = new Dictionary<int, string[]>();
+        static private List<string[]> myList = new List<string[]>();
 
         static void ReadTxtFile()
         {
-            Console.WriteLine("Trying to read the text file 'rowbased_format.txt'...");
+            Console.WriteLine("Reading the text file 'people.txt'...");
 
             const string path = @"people.txt";
             string fileName = Path.GetFileName(path);
             string[] lines = File.ReadAllLines(fileName);
-            int dictIndex = 0;
 
             foreach(string line in lines)
             {
                 string[] splittedLine = line.Split('|');
-                myDict.Add(dictIndex, splittedLine);
-                dictIndex++;
+                myList.Add(splittedLine);
             }
             Console.WriteLine("File successfully read!");
         }
 
         static void WriteToXML()
         {
+            Console.WriteLine("Converting to XML format...");
+
             string previousLetter = "";
             bool firstPerson = true;
 
@@ -38,9 +38,9 @@ namespace XMLConverterApp {
             writer.WriteStartDocument();
             writer.WriteStartElement("people");
 
-            foreach(KeyValuePair<int, string[]> element in myDict)
+            foreach(string[] element in myList)
             {
-                if(String.Equals(element.Value[0], "P"))
+                if(String.Equals(element[0], "P"))
                 {
                     if(firstPerson == false)
                     {
@@ -53,49 +53,49 @@ namespace XMLConverterApp {
                     writer.WriteStartElement("person");
 
                     writer.WriteStartElement("firstname");
-                    writer.WriteString(element.Value[1]);
+                    writer.WriteString(element[1]);
                     writer.WriteEndElement();
 
                     writer.WriteStartElement("lastname");
-                    writer.WriteString(element.Value[2]);
+                    writer.WriteString(element[2]);
                     writer.WriteEndElement();
 
-                    previousLetter = element.Value[0];
+                    previousLetter = element[0];
                     firstPerson = false;
                 }
-                else if(String.Equals(element.Value[0], "T"))
+                else if(String.Equals(element[0], "T"))
                 {
                     writer.WriteStartElement("phone");
 
                     writer.WriteStartElement("mobile");
-                    writer.WriteString(element.Value[1]);
+                    writer.WriteString(element[1]);
                     writer.WriteEndElement();
 
                     writer.WriteStartElement("landline");
-                    writer.WriteString(element.Value[2]);
+                    writer.WriteString(element[2]);
                     writer.WriteEndElement();
 
                     writer.WriteEndElement();
                 }
-                else if(String.Equals(element.Value[0], "A"))
+                else if(String.Equals(element[0], "A"))
                 {
                     writer.WriteStartElement("address");
 
                     writer.WriteStartElement("street");
-                    writer.WriteString(element.Value[1]);
+                    writer.WriteString(element[1]);
                     writer.WriteEndElement();
 
                     writer.WriteStartElement("city");
-                    writer.WriteString(element.Value[2]);
+                    writer.WriteString(element[2]);
                     writer.WriteEndElement();
 
                     writer.WriteStartElement("zipcode");
-                    writer.WriteString(element.Value[3]);
+                    writer.WriteString(element[3]);
                     writer.WriteEndElement();
 
                     writer.WriteEndElement();
                 }
-                else if(String.Equals(element.Value[0], "F"))
+                else if(String.Equals(element[0], "F"))
                 {
                     if(String.Equals(previousLetter, "F"))
                     {
@@ -104,20 +104,21 @@ namespace XMLConverterApp {
                     writer.WriteStartElement("family");
 
                     writer.WriteStartElement("name");
-                    writer.WriteString(element.Value[1]);
+                    writer.WriteString(element[1]);
                     writer.WriteEndElement();
 
                     writer.WriteStartElement("year");
-                    writer.WriteString(element.Value[2]);
+                    writer.WriteString(element[2]);
                     writer.WriteEndElement();
 
-                    previousLetter = element.Value[0];
+                    previousLetter = element[0];
                 }  
             }
-
             writer.WriteEndElement();
             writer.WriteEndDocument();
             writer.Close();
+
+            Console.WriteLine("Successfully converted and generated a XML file, 'people.xml'!");
         }
 
         static void Main(string[] args) {
